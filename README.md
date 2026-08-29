@@ -33,9 +33,7 @@ npm run seed
 npm run dev
 ```
 
-- **Frontend:** http://localhost:5173
-- **Backend API:** http://localhost:5000/api
-- **Health Check:** http://localhost:5000/health
+- **Live:** https://safeground-two.vercel.app/
 
 ---
 
