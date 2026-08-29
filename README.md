@@ -33,7 +33,7 @@ npm run seed
 npm run dev
 ```
 
-- **Live:** https://safeground-two.vercel.app/
+- **Live:** https://safeground-two.vercel.app
 
 ---
 
