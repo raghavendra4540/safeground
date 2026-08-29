@@ -1,0 +1,19 @@
+{
+  "name": "safeground-ai",
+  "version": "1.0.0",
+  "description": "SafeGround AI — Multi-Hazard Red Zone & Relocation Decision Support Platform",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --names \"SERVER,CLIENT\" --prefix-colors \"blue,green\" \"npm run server\" \"npm run client\"",
+    "server": "npm --prefix server run dev",
+    "client": "npm --prefix client run dev",
+    "build": "npm --prefix server install && npm --prefix client install && npm --prefix client run build",
+    "build:client": "npm --prefix client run build",
+    "start": "npm --prefix server start",
+    "seed": "npm --prefix server run seed",
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
