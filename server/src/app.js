@@ -84,15 +84,93 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/regions', regionRoutes);
 
-// In production, serve static files from client/dist if present
-const clientDistPath = path.resolve(__dirname, '../../client/dist');
-if (fs.existsSync(clientDistPath)) {
+// Resolve possible paths for client build
+const potentialDistPaths = [
+  path.resolve(__dirname, '../../client/dist'),
+  path.resolve(process.cwd(), 'client/dist'),
+  path.resolve(process.cwd(), '../client/dist'),
+  path.resolve(__dirname, '../public'),
+];
+const clientDistPath = potentialDistPaths.find(p => fs.existsSync(p));
+
+if (clientDistPath) {
   app.use(express.static(clientDistPath));
   app.get('*', (req, res, next) => {
-    if (req.originalUrl.startsWith('/api')) {
+    if (req.originalUrl.startsWith('/api') || req.originalUrl.startsWith('/health')) {
       return next();
     }
     res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+} else {
+  // If running as standalone backend API, provide a clean status landing page on /
+  app.get('/', (req, res) => {
+    // Check if client expects JSON
+    if (req.headers.accept && req.headers.accept.includes('application/json')) {
+      return res.json({
+        success: true,
+        name: 'SafeGround AI Backend API',
+        status: 'ONLINE',
+        version: '1.0.0',
+        environment: config.nodeEnv,
+        endpoints: {
+          health: '/health',
+          apiHealth: '/api/health',
+          overview: '/api/dashboard/overview?region=All+India',
+          regions: '/api/regions',
+          settlements: '/api/settlements',
+          safeSites: '/api/safe-sites',
+          hazards: '/api/hazards',
+          auth: '/api/auth/me',
+        },
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    // Return HTML status page for browser visits
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SafeGround AI — Backend API</title>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #070d18; color: #e2e8f0; margin: 0; padding: 40px 20px; display: flex; justify-content: center; }
+          .card { max-width: 640px; width: 100%; background: #0f1a2e; border: 1px solid #1e293b; border-radius: 16px; padding: 32px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+          .badge { display: inline-block; background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+          h1 { margin: 0 0 8px 0; font-size: 24px; color: #ffffff; }
+          p { color: #94a3b8; font-size: 14px; line-height: 1.5; margin: 0 0 24px 0; }
+          .endpoints { background: #070d18; border: 1px solid #1e293b; border-radius: 10px; padding: 16px; margin-bottom: 24px; }
+          .endpoints h3 { font-size: 13px; color: #94a3b8; text-transform: uppercase; margin: 0 0 12px 0; letter-spacing: 0.05em; }
+          .endpoint-link { display: block; color: #60a5fa; text-decoration: none; font-size: 13px; font-family: monospace; padding: 6px 0; border-bottom: 1px solid #1e293b; }
+          .endpoint-link:last-child { border-bottom: none; }
+          .endpoint-link:hover { color: #93c5fd; text-decoration: underline; }
+          .footer { font-size: 12px; color: #64748b; text-align: center; }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <div class="badge">● API SERVER ONLINE</div>
+          <h1>🛡️ SafeGround AI Backend</h1>
+          <p>The disaster-management decision-support API is live and operational with Pan-India multi-hazard intelligence.</p>
+          
+          <div class="endpoints">
+            <h3>Key API Endpoints</h3>
+            <a class="endpoint-link" href="/health" target="_blank">GET /health → System Health Check</a>
+            <a class="endpoint-link" href="/api/dashboard/overview?region=All+India" target="_blank">GET /api/dashboard/overview → Pan-India Disaster KPIs</a>
+            <a class="endpoint-link" href="/api/regions" target="_blank">GET /api/regions → 16 Indian Hotspot Regions</a>
+            <a class="endpoint-link" href="/api/settlements" target="_blank">GET /api/settlements → 82 Monitored Settlements</a>
+            <a class="endpoint-link" href="/api/safe-sites" target="_blank">GET /api/safe-sites → 35 Safe Host Sites</a>
+            <a class="endpoint-link" href="/api/hazards" target="_blank">GET /api/hazards → Multi-Hazard Polygons</a>
+          </div>
+
+          <div class="footer">
+            SafeGround AI v1.0 · Node.js ${process.version} · Environment: ${config.nodeEnv}
+          </div>
+        </div>
+      </body>
+      </html>
+    `);
   });
 }
 
