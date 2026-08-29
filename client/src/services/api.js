@@ -4,11 +4,7 @@ const resolveApiUrl = () => {
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
-  // In production builds when served together or via proxy, use relative /api
-  if (import.meta.env.PROD) {
-    return '/api';
-  }
-  return 'http://localhost:5000/api';
+  return 'https://safeground.onrender.com/api';
 };
 
 const API_URL = resolveApiUrl();
