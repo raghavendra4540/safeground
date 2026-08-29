@@ -46,12 +46,12 @@ const Topbar = ({ title = 'SafeGround AI' }) => {
   const currentRegionObj = allRegions.find(r => r.name === selectedRegion) || { name: selectedRegion };
 
   return (
-    <header className="h-14 bg-navy-900/90 backdrop-blur border-b border-white/5 flex items-center gap-3 px-4 md:px-6 sticky top-0 z-30">
+    <header className="h-14 bg-navy-900/95 backdrop-blur border-b border-white/5 flex items-center gap-3 px-4 md:px-6 sticky top-0 z-[5000]">
       {/* Title */}
       <h2 className="text-sm font-semibold text-gray-200 hidden md:block">{title}</h2>
 
       {/* Pan-India Region selector */}
-      <div className="relative" ref={dropdownRef}>
+      <div className="relative z-[5001]" ref={dropdownRef}>
         <button
           onClick={() => setShowRegion(!showRegion)}
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-sm text-gray-100 font-medium transition-all shadow-sm group"
@@ -63,7 +63,7 @@ const Topbar = ({ title = 'SafeGround AI' }) => {
         </button>
 
         {showRegion && (
-          <div className="absolute top-full mt-2 left-0 w-80 max-h-[480px] flex flex-col bg-navy-900 border border-blue-500/30 rounded-xl shadow-2xl z-50 overflow-hidden backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-150">
+          <div className="absolute top-full mt-2 left-0 w-80 max-h-[480px] flex flex-col bg-navy-900 border border-blue-500/40 rounded-xl shadow-2xl z-[9999] overflow-hidden backdrop-blur-2xl animate-in fade-in slide-in-from-top-2 duration-150">
             {/* Header & Search */}
             <div className="p-2.5 border-b border-white/10 bg-navy-950/70">
               <div className="flex items-center justify-between mb-2 px-1">
